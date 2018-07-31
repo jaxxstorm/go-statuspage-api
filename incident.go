@@ -176,9 +176,9 @@ func (c *Client) CreateIncident(component, name, message, status, component_stat
 		return nil, err
 	}
 
-	c := make(map[string]string)
+	comp := make(map[string]string)
 
-	c[cp.ID] = component_status
+	comp[*cp.ID] = component_status
 
 	i := &NewIncident{
 		Name:                   name,
@@ -187,7 +187,7 @@ func (c *Client) CreateIncident(component, name, message, status, component_stat
 		WantsTwitterUpdate:     false,
 		ImpactOverride:         "none",
 		ComponentIDs:           []string{*cp.ID},
-		ComponentStatusChanges: c,
+		ComponentStatusChanges: comp,
 	}
 	resp := &Incident{}
 	err = c.doPost("incidents.json", i, resp)
