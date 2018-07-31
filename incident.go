@@ -49,23 +49,32 @@ type Incident struct {
 type IncidentResponse []Incident
 
 type NewIncident struct {
-	Name               string
-	Status             string
-	Message            string
-	WantsTwitterUpdate bool
-	ImpactOverride     string
-	ComponentIDs       []string
+	Name                   string
+	Status                 string
+	Message                string
+	WantsTwitterUpdate     bool
+	ImpactOverride         string
+	ComponentIDs           []string
+	ComponentStatusChanges map[string]string
 }
 
 func (i *NewIncident) String() string {
-	return encodeParams(map[string]interface{}{
+
+	params := map[string]interface{}{
 		"incident[name]":                 i.Name,
 		"incident[status]":               i.Status,
-		"incident[wants_twitter_update]": i.WantsTwitterUpdate,
 		"incident[message]":              i.Message,
+		"incident[wants_twitter_update]": i.WantsTwitterUpdate,
 		"incident[impact_override]":      i.ImpactOverride,
-		"incident[component_ids][]":      i.ComponentIDs,
-	})
+		"incident[component_ids]":        i.ComponentIDs,
+	}
+
+	for k, val := range i.ComponentStatusChanges {
+		key := fmt.Sprintf("incident[components][%s]", k)
+		params[key] = val
+	}
+
+	return encodeParams(params)
 }
 
 type ScheduledIncident struct {
