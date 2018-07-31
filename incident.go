@@ -178,7 +178,7 @@ func (c *Client) CreateIncident(component, name, message, status, component_stat
 
 	c := make(map[string]string)
 
-	c[*cp.ID] = component_status
+	c[cp.ID] = component_status
 
 	i := &NewIncident{
 		Name:                   name,
