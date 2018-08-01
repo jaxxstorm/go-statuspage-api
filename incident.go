@@ -250,12 +250,20 @@ func (c *Client) CreateHistoricIncident(name, message string, date time.Time) (*
 // UpdateIncident updates an incident. If Status and/or Message are different,
 // a new update will be published for the incident. Each change will add an
 // update notification, so updates should be batched.
-func (c *Client) UpdateIncident(incident *Incident, name, status, message, component_status string) (*Incident, error) {
+func (c *Client) UpdateIncident(incident *Incident, name, status, message, component_status, component string) (*Incident, error) {
 	path := "incidents/" + *incident.ID + ".json"
 
 	comp := make(map[string]string)
 
-	comp[*incident.ID] = component_status
+	var err error
+
+	if component != "" && component_status != "" {
+		cp, err := c.GetComponentByName(component)
+		if err != nil {
+			return nil, err
+		}
+		comp[*cp.ID] = component_status
+	}
 
 	u := &NewIncidentUpdate{
 		Name:                   name,
@@ -264,7 +272,7 @@ func (c *Client) UpdateIncident(incident *Incident, name, status, message, compo
 		ComponentStatusChanges: comp,
 	}
 	resp := &Incident{}
-	err := c.doPatch(path, u, resp)
+	err = c.doPatch(path, u, resp)
 	if err != nil {
 		return nil, err
 	}
