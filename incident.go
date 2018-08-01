@@ -250,12 +250,18 @@ func (c *Client) CreateHistoricIncident(name, message string, date time.Time) (*
 // UpdateIncident updates an incident. If Status and/or Message are different,
 // a new update will be published for the incident. Each change will add an
 // update notification, so updates should be batched.
-func (c *Client) UpdateIncident(incident *Incident, name, status, message string) (*Incident, error) {
+func (c *Client) UpdateIncident(incident *Incident, name, status, message, component_status string) (*Incident, error) {
 	path := "incidents/" + *incident.ID + ".json"
+
+	comp := make(map[string]string)
+
+	comp[*incident.ID] = component_status
+
 	u := &NewIncidentUpdate{
-		Name:    name,
-		Status:  status,
-		Message: message,
+		Name:                   name,
+		Status:                 status,
+		Message:                message,
+		ComponentStatusChanges: comp,
 	}
 	resp := &Incident{}
 	err := c.doPatch(path, u, resp)
